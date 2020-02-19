@@ -9,9 +9,11 @@ let tweets = require('../corpus/trumptweet.json');
 const formatText = (text) => text.replace(/'|"|https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi, '')
   .replace(/([\r\n\t]+|\.\.+)/gi, ' ').replace(/\s{2,}/gi, ' ').replace(/[–.,:]\s/gi, ' $&').split(' ');
 
-const rawCorpus = fs.readFileSync(path.join(__dirname, '../corpus/trump.txt'), 'utf-8');
+const trumpCorpus = fs.readFileSync(path.join(__dirname, '../corpus/trump.txt'), 'utf-8');
+const obamaCorpus = fs.readFileSync(path.join(__dirname, '../corpus/obama.txt'), 'utf-8');
+const variousCorpus = fs.readFileSync(path.join(__dirname, '../corpus/various.txt'), 'utf-8');
 
-const formattedCorpus = tweets.map((tweet) => formatText(tweet.text)).concat(formatText(rawCorpus));
+const formattedCorpus = tweets.map((tweet) => formatText(tweet.text)).concat(formatText(trumpCorpus, obamaCorpus, variousCorpus));
 
 const markovMatrix = {};
 const INITIAL_STATE = '###initial_state###';
@@ -54,7 +56,6 @@ for(const token in markovMatrix) {
 const WORD_LIMIT = 10;
 const ABSOLUTE_LIMIT = 30;
 const DELIMITER = ' ';
-
 
 let token = INITIAL_STATE;
 let wordCount = 0;
