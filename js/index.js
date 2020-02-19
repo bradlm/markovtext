@@ -56,31 +56,38 @@ for(const token in markovMatrix) {
 const WORD_LIMIT = 10;
 const ABSOLUTE_LIMIT = 30;
 const DELIMITER = ' ';
+const TEXT_EDGE = '\n================\n';
 
-let token = INITIAL_STATE;
-let wordCount = 0;
 let output = '';
-while(wordCount < ABSOLUTE_LIMIT && !fullStops.includes(token)) {
-  const leader = weightedLimitMatrix[token];
-  const stops = [];
-  fullStops.forEach((stop) => {
-    if(Object.values(leader).includes(stop)) {
-      stops.push(stop);
-    }
-  })
-  if(wordCount++ >= WORD_LIMIT && stops.length) {
-    output += stops[Math.floor(Math.random() * stops.length)];
-    break;
-  } else {
-    const randomNumber = Math.floor(Math.random() * 100);
-    const descendingKeys = Object.keys(leader).sort((a,b) => b - a);
-    do {
-      token = leader[descendingKeys.pop()] || token;
-    } while(descendingKeys.length && descendingKeys[descendingKeys.length - 1] <= randomNumber);
-    if(token) {
-      output += output.length && token.match(/^[^,.!?]/) ? DELIMITER + token : token;
+for(let i = 0; i < (process.env.COUNT || 3); i++) {
+  output += output.length ? '\n----\n' : TEXT_EDGE;
+  let token = INITIAL_STATE;
+  let sentence = '';
+  let wordCount = 0;
+  while(wordCount < ABSOLUTE_LIMIT && !fullStops.includes(token)) {
+    const leader = weightedLimitMatrix[token];
+    const stops = [];
+    fullStops.forEach((stop) => {
+      if(Object.values(leader).includes(stop)) {
+        stops.push(stop);
+      }
+    })
+    if(wordCount++ >= WORD_LIMIT && stops.length) {
+      sentence += stops[Math.floor(Math.random() * stops.length)];
+      break;
+    } else {
+      const randomNumber = Math.floor(Math.random() * 100);
+      const descendingKeys = Object.keys(leader).sort((a,b) => b - a);
+      do {
+        token = leader[descendingKeys.pop()] || token;
+      } while(descendingKeys.length && descendingKeys[descendingKeys.length - 1] <= randomNumber);
+      if(token) {
+        sentence += sentence.length && token.match(/^[^,.!?]/) ? DELIMITER + token : token;
+      }
     }
   }
+  output += sentence;
 }
+output += TEXT_EDGE;
 
 console.log(output);
